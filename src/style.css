@@ -1,5 +1,6 @@
 *
 {
+  box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
@@ -164,7 +165,7 @@ body
     position: fixed;
     top: 20px;
     right: 20px;
-    width: 300px;
+    width: 400px;
     background-color: #282c34; /* Deep dark background for main container */
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     border-radius: 8px;
@@ -230,4 +231,158 @@ body
 .slider-container span {
     color: #ddd; /* Lighter text for better readability */
     text-shadow: 1px 1px 2px #000; /* Soft shadow for depth */
+}
+
+.selection-menu-container {
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.selection-menu-container label {
+  margin-bottom: 5px;
+}
+
+.selection-menu-container ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.selection-menu-container li {
+  cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+  /* margin: 2px 0; */
+  /* padding: 5px; */
+  border-radius: 5px;
+}
+
+.selection-menu-container li:hover {
+  background-color: #ddd;
+}
+
+
+#closeMapSelection {
+    position: absolute;
+    top: -20%; /* Adjust as needed */
+    left: 0%; /* Adjust as needed */
+    background-color: rgba(255, 255, 255, 0.4); /* Semi-transparent white for glass effect */
+    border: none;
+    border-radius: 50%; /* Circular shape */
+    cursor: pointer;
+    font-size: 24px; /* Icon size, adjust as needed */
+    width: 40px; /* Button size */
+    height: 40px; /* Button size */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+    backdrop-filter: blur(10px); /* Glassmorphism effect */
+    border: 2px solid rgba(255, 255, 255, 0.5); /* White border for more glass effect */
+    transition: transform 0.3s ease, background-color 0.3s ease; /* Smooth transitions for hover */
+    z-index: 101;
+}
+
+#closeMapSelection:hover {
+    transform: scale(1.1); /* Slightly larger on hover */
+    background-color: rgba(255, 255, 255, 0.6); /* Lighter on hover */
+}
+
+#uiMaps {
+  position: fixed;
+    bottom: 0%; /* vertical positioning */
+    width: 100%;
+    white-space: nowrap; 
+    justify-content: center;
+    padding: 10px 0;
+    background-color: rgba(255, 255, 255, 0.2); /* Semi-transparent background */
+    backdrop-filter: blur(10px); /* Apply a blur effect to the background */
+    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Slightly visible border */
+    /* overflow-x: scroll; /* Allows scrolling horizontally if many thumbnails */ */
+    scrollbar-width: thin; /* for firefox */
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(255, 255, 255, 0.2); /* for firefox */
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    opacity: 0; /* Start fully transparent */
+    visibility: hidden; /* Start as not visible */
+    transform: translateY(100%); /* Start off-screen */
+    transition: opacity 0.8s ease, transform 0.8s ease, visibility 0s linear 0.8s; /* Smooth transitions for opacity and transform */
+}
+
+
+#uiMaps.open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0%);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  justify-content: center;
+  align-items: center;
+}
+
+#uiMaps::-webkit-scrollbar {
+    width: 5px; /* Adjust the width of the scrollbar */
+}
+
+#uiMaps::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.2); /* color */
+    border-radius: 3px; /* Rounded corners for the thumb */
+}
+
+#uiMaps::-webkit-scrollbar-track {
+  background-color: transparent; /* hide track */
+    /* background: rgba(0, 0, 0, 0.3); /* Track color */ */
+}
+
+.map-option {
+  flex: none;
+  /* margin: 0 10px; */
+  transition: transform 0.2s;
+  cursor: pointer;
+  list-style-type: none; /* Removes the default list item indicator */
+  padding: 0; /* Resets any default padding */
+  margin: 0; /* Resets any default margin */
+}
+
+.map-option img:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.05);
+}
+
+.map-thumbnail {
+    width: 300px;
+    height: 80px;
+    object-fit: cover;
+    /* margin-right: 10px; */
+    border-radius: 5px;
+}
+
+.map-name {
+    color: white;
+    font-weight: 500;
+}
+
+.maps-list {
+  width: auto;
+    display: flex;
+    /* padding: 10px; */
+    gap: 20px; /* Space between items */
+}
+
+#toggleMapsButton {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(255, 255, 255, 0.4);
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 24px;
+  padding: 10px 15px;
+  backdrop-filter: blur(5px);
+}
+
+#toggleMapsButton:hover {
+  background-color: rgba(255, 255, 255, 0.6);
 }

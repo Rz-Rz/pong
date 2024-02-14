@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { RGBELoader } from 'three/examples/jsm/loaders/RGBELoader.js';
+import { EXRLoader } from 'three/examples/jsm/loaders/EXRLoader.js';
 import EventEmitter from './EventEmitter.js';
 
 export default class Resources extends EventEmitter 
@@ -25,6 +27,8 @@ export default class Resources extends EventEmitter
     this.loaders.gltfLoader = new GLTFLoader();
     this.loaders.textureLoader = new THREE.TextureLoader();
     this.loaders.cubeTextureLoader = new THREE.CubeTextureLoader();
+    this.loaders.rgbeLoader = new RGBELoader();
+    // this.loaders.exrLoader = new EXRLoader();
   }
 
   startLoading() 
@@ -57,6 +61,28 @@ export default class Resources extends EventEmitter
           source.path,
           (file) => 
           {
+            this.sourceLoaded(source, file);
+          }
+        );
+      }
+      else if (source.type === 'hdrTextureEquirectangular')
+      {
+        this.loaders.rgbeLoader.load(
+          source.path,
+          (file) => 
+          {
+            file.mapping = THREE.EquirectangularReflectionMapping;
+            this.sourceLoaded(source, file);
+          }
+        );
+      }
+      else if (source.type === 'pngEquirectangular')
+      {
+        this.loaders.textureLoader.load(
+          source.path,
+          (file) => 
+          {
+            file.mapping = THREE.EquirectangularReflectionMapping;
             this.sourceLoaded(source, file);
           }
         );

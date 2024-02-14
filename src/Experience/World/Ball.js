@@ -11,6 +11,8 @@ constructor() {
   this.color = 0xffffff;
   this.position = { x: 0, y: -48, z: 0 };
   this.speed = 0.2;
+  this.ballStopped = false;
+  this.scoreUpdated = true;
 
   this.direction = Math.random() < 0.5 ? -1 : 1;
   this.velocity = { x: 0, z: this.direction * 20 };
@@ -29,11 +31,16 @@ constructor() {
   this.customWidth = 5000;
   this.customHeightOffset = 435;
 
+
+
   this.scoreboard = new Scoreboard('gamescore');
   this.setGeometry();
   this.setMaterial();
   this.setMesh();
   this.debug();
+  setTimeout(() => {
+    this.scoreUpdated = false; 
+  }, 1000);
 }
 
 debug() {
@@ -55,7 +62,6 @@ debug() {
   // Slider for customHeightOffset
   const heightOffsetSlider = new Slider('Height Offset', -1000, 1000, 10, this, 'customHeightOffset');
   this.experience.world.settings.addSliderToGroup('Ball', heightOffsetSlider);
-
 }
 
 updateGeometry() {
@@ -87,26 +93,35 @@ setMesh() {
   this.scene.add(this.mesh);
 }
 
+
 update()
 {
   this.checkBorderCollision();
-  this.mesh.position.x += this.velocity.x * this.time.delta * this.speed;
-  this.mesh.position.z += this.velocity.z * this.time.delta * this.speed;
+  if (!this.ballStopped) {
+    this.mesh.position.x += this.velocity.x * this.time.delta * this.speed;
+    this.mesh.position.z += this.velocity.z * this.time.delta * this.speed;
+  }
   //Apply gravity to vertical velocity 
   this.mesh.position.y = -((this.mesh.position.z - 0) * (this.mesh.position.z - 0) / 2100) + -10;
   this.processCpuPaddle();
   if (this.isPastPaddle1()) {
-    console.log("past paddle 1");
-    this.scoreboard.updateScore('player2', 1);
+    if (!this.scoreUpdated)
+    {
+      console.log('Player 2 scored');
+      this.scoreboard.updateScore('player2', 1);
+      this.scoreUpdated = true;
+    }
     this.stopBall();
     setTimeout(() => {
       this.resetBall();
     }, 1000);
   }
   if (this.isPastPaddle2()) {
-    console.log("past paddle 2");
-    this.scoreboard.updateScore('player', 1);
-    this.stopBall();
+    if (!this.scoreUpdate) {
+      console.log('Player 1 scored');
+      this.scoreboard.updateScore('player1', 1);
+      this.stopBall();
+    }
     setTimeout(() => {
       this.resetBall();
     }, 1000);
@@ -114,16 +129,23 @@ update()
 }
 
 stopBall() {
+  this.ballStopped = true;
   this.velocity.x = 0;
   this.velocity.z = 0;
 }
 
 resetBall() {
+  this.ballStopped = false;
   this.mesh.position.set(this.position.x, 1, this.position.z);
   let direction = Math.random() < 0.5 ? -1 : 1;
   this.velocity.x = 0;
   this.velocity.y = 0;
   this.velocity.z = direction * 2;
+
+  // Introduce a delay before the ball can score again
+  setTimeout(() => {
+    this.scoreUpdated = false; // A new flag to control scoring
+  }, 500); // Delay in milliseco
 }
 
 
@@ -131,7 +153,6 @@ isSideCollision() {
   let ballX = this.mesh.position.x;
   let halfFieldWidth = this.experience.world.floor.fieldWidth / 2;
   return ballX - this.radius <= -halfFieldWidth || ballX + this.radius >= halfFieldWidth;
-    
 }
 
 isBallAlignedWithPaddle(paddle) {
@@ -172,19 +193,37 @@ isPastPaddle2() {
 return this.mesh.position.z < this.paddle2.mesh.position.z;
 }
 
+
 checkBorderCollision() {
-  // Collision with vertical borders
-  if (this.isSideCollision()) {
-    console.log("collision");
-    this.velocity.x *= -1; // Invert X velocity
-  }
   if (this.paddle1Collision()) {
-  this.mesh.position.z = this.paddle1.mesh.position.z - this.radius;
+    this.mesh.position.z = this.paddle1.mesh.position.z - this.radius;
     this.hitBall(this.paddle1);
   }
   if (this.paddle2Collision()) {
-  this.mesh.position.z = this.paddle2.mesh.position.z + this.radius;
+    this.mesh.position.z = this.paddle2.mesh.position.z + this.radius;
     this.hitBall(this.paddle2);
+  }
+  // Collision with vertical borders
+  if (this.isSideCollision()) {
+    // Assuming the walls are accessible via the experience.world object
+    const leftWall = this.experience.world.leftWall;
+    const rightWall = this.experience.world.rightWall;
+
+    // Get ball's current position
+    console.log(this.mesh.position);
+    const ball = this.mesh.position.clone();
+    const ballRadius = this.radius;
+    console.log(ball);
+
+    // Check for collision with the left wall
+    if (ball.x - ballRadius <= leftWall.mesh.position.x + leftWall.size.width / 2) {
+      this.velocity.x *= -1; // Invert X velocity to bounce back
+    }
+
+    // Check for collision with the right wall
+    if (ball.x + ballRadius >= rightWall.mesh.position.x - rightWall.size.width / 2) {
+      this.velocity.x *= -1; // Invert X velocity to bounce back
+    }
   }
 }
 }

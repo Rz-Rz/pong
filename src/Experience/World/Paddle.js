@@ -62,11 +62,9 @@ debug() {
   addControls() {
     document.addEventListener('keydown', (event) => {
       if (event.code === 'ArrowRight') {
-        console.log('move up');
         this.trigger('moveUp');
       }
       else if (event.code === 'ArrowLeft') {
-        console.log('move down');
         this.trigger('moveDown');
       }
     });
