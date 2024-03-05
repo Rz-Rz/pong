@@ -71,6 +71,39 @@ updateGeometry() {
     this.mesh.geometry = new THREE.SphereGeometry(this.radius, this.widthSegments, this.heightSegments);
 }
 
+updateData() {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const raw = JSON.stringify({
+        "name": "DeftBall",
+        "position": {
+            "x": 69,
+            "y": 49.497142857142855,
+            "z": 288
+        },
+        "velocity": {
+            "x": 0,
+            "z": 0
+        },
+        "speed": 0.2,
+        "direction": 1
+    });
+
+    const requestOptions = {
+        method: "POST",
+        headers: myHeaders,
+        body: raw,
+        redirect: "follow"
+    };
+
+    fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
+        .then(response => response.text())
+        .then(result => console.log(result))
+        .catch(error => console.error('error:', error));
+}
+
+
 
 setRadius(radius) {
   this.radius = radius;
@@ -93,9 +126,44 @@ setMesh() {
   this.scene.add(this.mesh);
 }
 
+async submitBallData() {
+  const myHeaders = new Headers();
+  myHeaders.append("Content-Type", "application/json");
+
+  const data = {
+    name: 'ball',
+    position: {
+      x: this.mesh.position.x,
+      y: this.mesh.position.y,
+      z: this.mesh.position.z
+    },
+    velocity: {
+      x: this.velocity.x,
+      z: this.velocity.z
+    },
+    speed: this.speed,
+    direction: this.velocity.z >= 0 ? 1 : -1 // Assuming positive Z direction is forward
+  };
+
+  const requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: JSON.stringify(data),
+    redirect: 'follow'
+  };
+
+  fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
+    .then(response => response.json()) // Adjusted to parse JSON instead of text
+    .then(result => console.log('Submission Response:', result))
+    .catch(error => console.log('Error:', error));
+
+  console.log(JSON.stringify(data));
+}
 
 update()
 {
+  this.updateData();
+  // this.submitBallData();
   this.checkBorderCollision();
   if (!this.ballStopped) {
     this.mesh.position.x += this.velocity.x * this.time.delta * this.speed;
@@ -164,6 +232,9 @@ isBallAlignedWithPaddle(paddle) {
 
 hitBall(paddle) {
   this.velocity.x = (this.mesh.position.x - paddle.mesh.position.x) / 5;
+  console.log("BALL: " + this.mesh.position.x);
+  console.log("PADDLE" + paddle.mesh.position.x);
+  console.log("BALL FINAL VELOCITY: " + this.velocity.x);
   this.velocity.z *= -1;
   this.velocity.y = 0.28;
 }

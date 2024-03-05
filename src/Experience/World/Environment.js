@@ -1,6 +1,8 @@
 import * as THREE from 'three';
 import Experience from '../Experience.js';
 import SelectionMenu from '../UI/SelectionMenu.js';
+import { VITE_URL } from '../Utils/Env.js';
+
 
 export default class Environment 
 {
@@ -31,12 +33,12 @@ document.getElementById('closeMapSelection').addEventListener('click', function(
 });
 
     const selectionMenu = new SelectionMenu([
-      { name: 'Desert River', mapName: 'desertRiverEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/desertRiver.png' },
-      { name: 'Ocean Island', mapName: 'oceanIslandsEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/oceanIslands.png'},
-      { name: 'Lush Forest', mapName: 'lushForestEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/lushForest.png'},
-      { name: 'Cyberpunk Neo', mapName: 'cyberpunkNeoEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/cyberpunkNeo.png'},
-      { name: 'Snowy Landscape', mapName: 'snowySiberiaEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/snowySiberia.png'},
-      { name: 'Water Palace', mapName: 'waterPalaceEnvMap', type: 'envMap', thumbnail: 'textures/environmentMap/waterPalace.png'},
+      { name: 'Desert River', mapName: 'desertRiverEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/desertRiver.png` },
+      { name: 'Ocean Island', mapName: 'oceanIslandsEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/oceanIslands.png` },
+      { name: 'Lush Forest', mapName: 'lushForestEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/lushForest.png` },
+      { name: 'Cyberpunk Neo', mapName: 'cyberpunkNeoEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/cyberpunkNeo.png` },
+      { name: 'Snowy Landscape', mapName: 'snowySiberiaEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/snowySiberia.png` },
+      { name: 'Water Palace', mapName: 'waterPalaceEnvMap', type: 'envMap', thumbnail: `${VITE_URL}/textures/environmentMap/waterPalace.png` }
     ], (option) => {
       if (option.type === 'envMap') {
         this.changeEnvironmentMap(option.mapName);
