@@ -267,11 +267,11 @@ return this.mesh.position.z < this.paddle2.mesh.position.z;
 
 checkBorderCollision() {
   if (this.paddle1Collision()) {
-    this.mesh.position.z = this.paddle1.mesh.position.z - this.radius;
+    this.mesh.position.z = this.paddle1.mesh.position.z - (this.radius + 10);
     this.hitBall(this.paddle1);
   }
   if (this.paddle2Collision()) {
-    this.mesh.position.z = this.paddle2.mesh.position.z + this.radius;
+    this.mesh.position.z = this.paddle2.mesh.position.z + (this.radius + 10);
     this.hitBall(this.paddle2);
   }
   // Collision with vertical borders
