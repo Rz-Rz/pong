@@ -1,0 +1,3 @@
+[submodule "src/Experience/UI"]
+	path = src/Experience/UI
+	url = git@github.com:Rz-Rz/EasyUI.git
