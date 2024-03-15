@@ -1,0 +1,23 @@
+-constructor default values for position is different from reset values(-48 or 1)
+-those position are only ever used in set mesh at the start, or after a ball reset
+(so, it would probably be possible to just get rid of it, it's a redundancy)
+-velocity default values is different from reset values (20 or 2)
+-this.ballStopped is never true, because stopball is always followed by a resetball(line 182 and 191)
+-if resetBall is always called immediatly after stopball, maybe the function stopball is not really useful
+-line 188 call a nonexistent value (scoreUpdate instead of scoreUpdated)
+-this.direction is not updated after the ball hit a paddle
+-it's also never used anywhere outside of start and reset
+-does timeout freeze the whole script? because if it freeze the paddles too, it feel really weird
+-velocity.y doesn't even exist in the constructor, but is assigned a new value in resetball (line 210)
+
+-in hitBall, the velocity.z *= -1 is perfectly logical, but in the debugging tools, that value is 0, which make no sense, because it absolutly move in the right direction
+-assigning velocity.y = 0.28 in hitBall is weird because it's never used and doesn't even exist in that object
+-the ball seems to not connect to the paddle, but the function to detect the collision work and do detect that a collision has taken place.
+-if there is a chance that the position.y calculation change the result of the game, it's a serious problem. That parameter should only be used to add the visual impression of a 3d movement, the actual game calculations should only use x and z data.
+-line 30-32, the Parameters for the arc Equation, i cannot find where they are used, only that they can be changed in the debug menu
+-ball speed is a semiconstant (can be changed by debug tools but should not vary naturally) value, so i can understand why they need to be send to server. But the ball radius, gravity, and the paddles sizes are also semiconstant and might also deserve to be send to the server
+-where is gravity stored/declared/used?
+-line 108, the function setradius is never called anywhere
+-if the paddle1Collision function is called a bit too late, it's possible that the ball visually got through the paddle and that the new position can be calculted as behind the paddle, and count as a point. It could be caused by a too long tick, low framerate, or various other material parameters
+-cpu paddle seems to teleport to it's new position, not move (less important for now)
+-i suspect the collision is calculated with the radius of the ball touching the center of an element (paddle or border) and not the border of that element. it might not be super visible, but that might also be an incoherence which will cause problems

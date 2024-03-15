@@ -71,37 +71,37 @@ updateGeometry() {
     this.mesh.geometry = new THREE.SphereGeometry(this.radius, this.widthSegments, this.heightSegments);
 }
 
-updateData() {
-    const myHeaders = new Headers();
-    myHeaders.append("Content-Type", "application/json");
+// updateData() {
+//     const myHeaders = new Headers();
+//     myHeaders.append("Content-Type", "application/json");
 
-    const raw = JSON.stringify({
-        "name": "DeftBall",
-        "position": {
-            "x": 69,
-            "y": 49.497142857142855,
-            "z": 288
-        },
-        "velocity": {
-            "x": 0,
-            "z": 0
-        },
-        "speed": 0.2,
-        "direction": 1
-    });
+//     const raw = JSON.stringify({
+//         "name": "DeftBall",
+//         "position": {
+//             "x": 69,
+//             "y": 49.497142857142855,
+//             "z": 288
+//         },
+//         "velocity": {
+//             "x": 0,
+//             "z": 0
+//         },
+//         "speed": 0.2,
+//         "direction": 1
+//     });
 
-    const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow"
-    };
+//     const requestOptions = {
+//         method: "POST",
+//         headers: myHeaders,
+//         body: raw,
+//         redirect: "follow"
+//     };
 
-    fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
-        .then(response => response.text())
-        .then(result => console.log(result))
-        .catch(error => console.error('error:', error));
-}
+//     fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
+//         .then(response => response.text())
+//         .then(result => console.log(result))
+//         .catch(error => console.error('error:', error));
+// }
 
 
 
@@ -162,15 +162,15 @@ async submitBallData() {
 
 update()
 {
-  this.updateData();
+  // this.updateData();
   // this.submitBallData();
-  this.checkBorderCollision();
   if (!this.ballStopped) {
     this.mesh.position.x += this.velocity.x * this.time.delta * this.speed;
     this.mesh.position.z += this.velocity.z * this.time.delta * this.speed;
   }
   //Apply gravity to vertical velocity 
   this.mesh.position.y = -((this.mesh.position.z - 0) * (this.mesh.position.z - 0) / 2100) + -10;
+  this.checkBorderCollision();
   this.processCpuPaddle();
   if (this.isPastPaddle1()) {
     if (!this.scoreUpdated)
