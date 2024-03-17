@@ -3,19 +3,24 @@ import Experience from '../Experience.js';
 import Scoreboard from '../UI/Scoreboard.js';
 import Slider from '../UI/Slider.js';
 
+// var socket = new WebSocket('ws://localhost:2667');
+// socket.onopen = function(event) {
+// 	//ready to send or receive data
+// 	socket.send(JSON.stringify('Hello World'));
+// };
 export default class Ball { 
 constructor() {
   this.experience = new Experience();
   this.scene = this.experience.scene;
   this.time = this.experience.time;
   this.color = 0xffffff;
-  this.position = { x: 0, y: -48, z: 0 };
+  this.position = { x: 0, y: 1, z: 0 };
   this.speed = 0.2;
   this.ballStopped = false;
   this.scoreUpdated = true;
 
   this.direction = Math.random() < 0.5 ? -1 : 1;
-  this.velocity = { x: 0, z: this.direction * 20 };
+  this.velocity = { x: 0, z: this.direction * 2 };
   // this.gravity = -0.002; // Gravity effect per frame
 
 
@@ -41,6 +46,9 @@ constructor() {
   setTimeout(() => {
     this.scoreUpdated = false; 
   }, 1000);
+
+//   this.socket = new WebSocket('ws://localhost:2667');
+//   this.socket.send('Hello World');
 }
 
 debug() {
@@ -126,44 +134,87 @@ setMesh() {
   this.scene.add(this.mesh);
 }
 
-async submitBallData() {
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
+async SocketPostClientGame() {
+	// const myHeaders = new Headers();
+	// myHeaders.append("Content-Type", "application/json");
 
-  const data = {
-    name: 'ball',
-    position: {
-      x: this.mesh.position.x,
-      y: this.mesh.position.y,
-      z: this.mesh.position.z
-    },
-    velocity: {
-      x: this.velocity.x,
-      z: this.velocity.z
-    },
-    speed: this.speed,
-    direction: this.velocity.z >= 0 ? 1 : -1 // Assuming positive Z direction is forward
-  };
+	const data = {
+	//   name: 'ball',
+	  ballposition: {
+		x: this.mesh.position.x,
+		z: this.mesh.position.z,
+	  //   z: this.mesh.position.y
+	  },
+	  ballvelocity: {
+		x: this.velocity.x,
+		z: this.velocity.z
+	  },
+	  positionpad: {
+		x: this.paddle1.mesh.position.x,
+	  },
+	  // input: {
+	  //   up: this.paddle1.input.up,
+	  //   down: this.paddle1.input.down
+	//   // },
+	//   positionpad2: {
+	// 	x: this.paddle2.mesh.position.x,
+	//   },
+	  // input: {
+	  //   up: this.paddle2.input.up,
+	  //   down: this.paddle2.input.down
+	  // },
+	};
 
-  const requestOptions = {
-    method: 'POST',
-    headers: myHeaders,
-    body: JSON.stringify(data),
-    redirect: 'follow'
-  };
+	const requestOptions = {
+	  method: 'GameInput',
+	  userID: '1',
+	  GameID: '1',
+	  body: JSON.stringify(data),
+	};
+	socket.send(JSON.stringify(requestOptions));
+	// this.SocketPostClientGame.send(JSON.stringify(requestOptions));
+	console.log(JSON.stringify(requestOptions));
+  }
 
-  fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
-    .then(response => response.json()) // Adjusted to parse JSON instead of text
-    .then(result => console.log('Submission Response:', result))
-    .catch(error => console.log('Error:', error));
+// async submitBallData() {
+//   const myHeaders = new Headers();
+//   myHeaders.append("Content-Type", "application/json");
 
-  console.log(JSON.stringify(data));
-}
+//   const data = {
+//     name: 'ball',
+//     position: {
+//       x: this.mesh.position.x,
+//       y: this.mesh.position.y,
+//     //   z: this.mesh.position.z
+//     },
+//     velocity: {
+//       x: this.velocity.x,
+//       z: this.velocity.z
+//     },
+//     speed: this.speed,
+//     direction: this.velocity.z >= 0 ? 1 : -1 // Assuming positive Z direction is forward
+//   };
+
+//   const requestOptions = {
+//     method: 'POST',
+//     headers: myHeaders,
+//     body: JSON.stringify(data),
+//     redirect: 'follow'
+//   };
+
+//   fetch("http://127.0.0.1:8000/game/api/ballData/", requestOptions)
+//     .then(response => response.json()) // Adjusted to parse JSON instead of text
+//     .then(result => console.log('Submission Response:', result))
+//     .catch(error => console.log('Error:', error));
+
+//   console.log(JSON.stringify(data));
+// }
 
 update()
 {
   // this.updateData();
   // this.submitBallData();
+//   this.SocketPostClientGame();
   if (!this.ballStopped) {
     this.mesh.position.x += this.velocity.x * this.time.delta * this.speed;
     this.mesh.position.z += this.velocity.z * this.time.delta * this.speed;
@@ -173,47 +224,54 @@ update()
   this.checkBorderCollision();
   this.processCpuPaddle();
   if (this.isPastPaddle1()) {
+	console.log('ball is past paddle 1');
     if (!this.scoreUpdated)
     {
       console.log('Player 2 scored');
       this.scoreboard.updateScore('player2', 1);
       this.scoreUpdated = true;
     }
-    this.stopBall();
+	this.resetBall();
+    this.ballStopped = true;
     setTimeout(() => {
-      this.resetBall();
+      this.ballStopped = false;
     }, 1000);
   }
   if (this.isPastPaddle2()) {
-    if (!this.scoreUpdate) {
+	console.log('ball is past paddle 2');
+    if (!this.scoreUpdated) {
       console.log('Player 1 scored');
       this.scoreboard.updateScore('player1', 1);
-      this.stopBall();
+      this.scoreUpdated = true;
     }
+	this.resetBall();
+    this.ballStopped = true;
     setTimeout(() => {
-      this.resetBall();
+      this.ballStopped = false;
     }, 1000);
   }
 }
 
-stopBall() {
-  this.ballStopped = true;
-  this.velocity.x = 0;
-  this.velocity.z = 0;
-}
+// stopBall() {
+//   this.ballStopped = true;
+//   this.velocity.x = 0;
+//   this.velocity.z = 0;
+// }
 
 resetBall() {
+
+	console.log('ball reset');
   this.ballStopped = false;
   this.mesh.position.set(this.position.x, 1, this.position.z);
   let direction = Math.random() < 0.5 ? -1 : 1;
   this.velocity.x = 0;
   this.velocity.y = 0;
   this.velocity.z = direction * 2;
-
+  this.scoreUpdated = false;
   // Introduce a delay before the ball can score again
-  setTimeout(() => {
-    this.scoreUpdated = false; // A new flag to control scoring
-  }, 500); // Delay in milliseco
+//   setTimeout(() => {
+//     this.scoreUpdated = false; // A new flag to control scoring
+//   }, 500); // Delay in milliseco
 }
 
 
@@ -236,7 +294,7 @@ hitBall(paddle) {
   console.log("PADDLE" + paddle.mesh.position.x);
   console.log("BALL FINAL VELOCITY: " + this.velocity.x);
   this.velocity.z *= -1;
-  this.velocity.y = 0.28;
+//   this.velocity.y = 0.28;
 }
 
 paddle2Collision() {
